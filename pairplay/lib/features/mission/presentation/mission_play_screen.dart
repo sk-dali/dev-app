@@ -131,6 +131,12 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.home),
+          tooltip: 'ホーム',
+          onPressed: () => context.go('/'),
+        ),
+        automaticallyImplyLeading: false,
         title: Text('${widget.category}のミッション'),
       ),
       body: SafeArea(

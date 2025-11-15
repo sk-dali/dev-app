@@ -30,6 +30,12 @@ class _TalkScreenState extends ConsumerState<TalkScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.home),
+          tooltip: 'ホーム',
+          onPressed: () => context.go('/'),
+        ),
+        automaticallyImplyLeading: false,
         title: const Text('ふたりトーク'),
         actions: [
           IconButton(

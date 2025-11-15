@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../features/history/domain/history_service.dart';
 import '../../../shared/services/local_storage_service.dart';
@@ -22,6 +23,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.home),
+          tooltip: 'ホーム',
+          onPressed: () => context.go('/'),
+        ),
+        automaticallyImplyLeading: false,
         title: const Text('思い出'),
       ),
       body: SafeArea(
