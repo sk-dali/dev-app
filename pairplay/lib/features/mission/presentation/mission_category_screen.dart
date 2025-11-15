@@ -9,6 +9,11 @@ class MissionCategoryScreen extends StatelessWidget {
     {'name': '遊園地', 'icon': '🎢', 'description': 'スリル満点のアトラクション'},
     {'name': 'カフェ', 'icon': '☕', 'description': 'ゆったりとした時間を過ごそう'},
     {'name': '公園', 'icon': '🌳', 'description': '自然の中でリラックス'},
+    {'name': 'カラオケ', 'icon': '🎤', 'description': '一緒に歌って楽しもう'},
+    {'name': 'ショッピング', 'icon': '🛍️', 'description': 'お互いの好みを発見しよう'},
+    {'name': '水族館、動物園', 'icon': '🐠', 'description': '生き物たちと触れ合おう'},
+    {'name': '季節のお題', 'icon': '🎄', 'description': 'クリスマス、お正月、ハロウィンなど'},
+    {'name': 'お家デート', 'icon': '🏠', 'description': 'リラックスした空間で過ごそう'},
     {'name': 'その他', 'icon': '✨', 'description': 'いろいろな場所で'},
   ];
 

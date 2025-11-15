@@ -64,12 +64,26 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
     if (_currentIndex >= _missions.length) return;
 
     final mission = _missions[_currentIndex];
+    
+    // 達成時のみ_doneMissionIdsに追加（カウントが進む）
+    // スキップ時は_skippedMissionIdsにのみ追加（カウントは進まない）
     if (isDone) {
-      _doneMissionIds.add(mission.id);
+      // 達成時のみカウントに追加（重複チェック）
+      if (!_doneMissionIds.contains(mission.id)) {
+        _doneMissionIds.add(mission.id);
+      }
+      // スキップリストから削除（達成した場合はスキップではない）
+      _skippedMissionIds.remove(mission.id);
     } else {
-      _skippedMissionIds.add(mission.id);
+      // スキップ時は_doneMissionIdsには追加しない（カウントは進まない）
+      if (!_skippedMissionIds.contains(mission.id)) {
+        _skippedMissionIds.add(mission.id);
+      }
+      // 達成リストから削除（スキップした場合は達成ではない）
+      _doneMissionIds.remove(mission.id);
     }
 
+    // 次のカードに進む（達成・スキップ問わず）
     if (_currentIndex < _missions.length - 1) {
       setState(() {
         _currentIndex++;
@@ -100,6 +114,9 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
     final screenWidth = MediaQuery.of(context).size.width;
     final threshold = screenWidth * 0.3; // 画面幅の30%を閾値とする
     
+    // スワイプ開始時の位置を保存（アニメーション完了時に使用）
+    final swipeStartPosition = _dragPosition;
+    
     if (_dragPosition.abs() > threshold) {
       // 閾値を超えたら、カードを画面外に飛ばす
       _isAnimating = true;
@@ -116,8 +133,8 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
       ));
       
       _animationController.forward().then((_) {
-        // アニメーション完了後、ミッションを完了
-        if (_dragPosition > 0) {
+        // アニメーション完了後、保存した位置を使って判定
+        if (swipeStartPosition > 0) {
           _completeMission(true); // 右スワイプで達成
         } else {
           _completeMission(false); // 左スワイプでスキップ
@@ -269,7 +286,10 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
     }
 
     final mission = _missions[_currentIndex];
-    final progress = (_currentIndex + 1) / _missions.length;
+    // 達成したミッション数のみをカウントに反映
+    final progress = _missions.length > 0 
+        ? _doneMissionIds.length / _missions.length 
+        : 0.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -318,7 +338,7 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${_currentIndex + 1} / ${_missions.length}',
+                    '${_doneMissionIds.length} / ${_missions.length}',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,

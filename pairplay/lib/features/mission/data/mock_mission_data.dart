@@ -134,5 +134,190 @@ final List<Mission> mockMissions = [
     description: '相手の好みを考えながら買い物しよう',
     difficulty: 1,
   ),
+
+  // カラオケカテゴリ
+  const Mission(
+    id: 'karaoke_1',
+    placeCategory: 'カラオケ',
+    title: 'デュエット曲を歌う',
+    description: '二人で一緒に歌える曲を選んで歌おう',
+    difficulty: 1,
+  ),
+  const Mission(
+    id: 'karaoke_2',
+    placeCategory: 'カラオケ',
+    title: '相手の好きな曲を歌う',
+    description: '相手がリクエストした曲を歌ってみよう',
+    difficulty: 2,
+  ),
+  const Mission(
+    id: 'karaoke_3',
+    placeCategory: 'カラオケ',
+    title: '恥ずかしい曲に挑戦する',
+    description: '普段は歌わないような曲を思い切って歌おう',
+    difficulty: 3,
+  ),
+  const Mission(
+    id: 'karaoke_4',
+    placeCategory: 'カラオケ',
+    title: '一緒にダンスしながら歌う',
+    description: '歌いながら簡単なダンスをしてみよう',
+    difficulty: 2,
+  ),
+  const Mission(
+    id: 'karaoke_5',
+    placeCategory: 'カラオケ',
+    title: 'お互いの歌を録画する',
+    description: '相手の歌っている姿を動画で撮影しよう',
+    difficulty: 1,
+  ),
+
+  // ショッピングカテゴリ
+  const Mission(
+    id: 'shopping_1',
+    placeCategory: 'ショッピング',
+    title: '相手の好みを予想して選ぶ',
+    description: '相手が好きそうなアイテムを選んでみよう',
+    difficulty: 2,
+  ),
+  const Mission(
+    id: 'shopping_2',
+    placeCategory: 'ショッピング',
+    title: '一緒に試着する',
+    description: 'お互いの試着姿を見せ合おう',
+    difficulty: 1,
+  ),
+  const Mission(
+    id: 'shopping_3',
+    placeCategory: 'ショッピング',
+    title: '相手にプレゼントを選ぶ',
+    description: '相手の喜ぶ顔を想像しながら選ぼう',
+    difficulty: 2,
+  ),
+  const Mission(
+    id: 'shopping_4',
+    placeCategory: 'ショッピング',
+    title: '一緒にコーディネートを考える',
+    description: 'お互いのコーディネートを提案し合おう',
+    difficulty: 2,
+  ),
+  const Mission(
+    id: 'shopping_5',
+    placeCategory: 'ショッピング',
+    title: '予算内でお互いのアイテムを選ぶ',
+    description: '決まった予算でお互いのアイテムを選んでみよう',
+    difficulty: 3,
+  ),
+
+  // 水族館、動物園カテゴリ
+  const Mission(
+    id: 'aquarium_zoo_1',
+    placeCategory: '水族館、動物園',
+    title: 'お気に入りの生き物を見つける',
+    description: 'お互いのお気に入りの生き物を教え合おう',
+    difficulty: 1,
+  ),
+  const Mission(
+    id: 'aquarium_zoo_2',
+    placeCategory: '水族館、動物園',
+    title: '一緒に写真を撮る',
+    description: '生き物を背景に記念写真を撮ろう',
+    difficulty: 1,
+  ),
+  const Mission(
+    id: 'aquarium_zoo_3',
+    placeCategory: '水族館、動物園',
+    title: '触れ合いコーナーで一緒に体験する',
+    description: '生き物と触れ合えるコーナーで一緒に体験しよう',
+    difficulty: 2,
+  ),
+  const Mission(
+    id: 'aquarium_zoo_4',
+    placeCategory: '水族館、動物園',
+    title: 'ショーやイベントを一緒に見る',
+    description: 'イルカショーや動物のショーを一緒に楽しもう',
+    difficulty: 1,
+  ),
+  const Mission(
+    id: 'aquarium_zoo_5',
+    placeCategory: '水族館、動物園',
+    title: '生き物の名前を覚えるゲーム',
+    description: 'お互いに生き物の名前を当てるゲームをしよう',
+    difficulty: 2,
+  ),
+
+  // 季節のお題カテゴリ
+  const Mission(
+    id: 'season_1',
+    placeCategory: '季節のお題',
+    title: 'クリスマスツリーの前で写真を撮る',
+    description: 'クリスマスツリーを背景に記念写真を撮ろう',
+    difficulty: 1,
+  ),
+  const Mission(
+    id: 'season_2',
+    placeCategory: '季節のお題',
+    title: 'お正月の初詣に行く',
+    description: '一緒に初詣に行って今年の願い事をしよう',
+    difficulty: 1,
+  ),
+  const Mission(
+    id: 'season_3',
+    placeCategory: '季節のお題',
+    title: 'ハロウィンのコスプレをする',
+    description: 'お互いにコスプレをしてハロウィンを楽しもう',
+    difficulty: 2,
+  ),
+  const Mission(
+    id: 'season_4',
+    placeCategory: '季節のお題',
+    title: '季節のイベントに参加する',
+    description: '花火大会やお祭りなど、季節のイベントを楽しもう',
+    difficulty: 1,
+  ),
+  const Mission(
+    id: 'season_5',
+    placeCategory: '季節のお題',
+    title: '季節限定メニューを一緒に食べる',
+    description: 'クリスマスケーキやおせちなど、季節の食べ物を楽しもう',
+    difficulty: 1,
+  ),
+
+  // お家デートカテゴリ
+  const Mission(
+    id: 'home_1',
+    placeCategory: 'お家デート',
+    title: '一緒に料理を作る',
+    description: '協力して一つの料理を完成させよう',
+    difficulty: 2,
+  ),
+  const Mission(
+    id: 'home_2',
+    placeCategory: 'お家デート',
+    title: '一緒に映画を見る',
+    description: 'お互いが選んだ映画を交互に見よう',
+    difficulty: 1,
+  ),
+  const Mission(
+    id: 'home_3',
+    placeCategory: 'お家デート',
+    title: '一緒にゲームをする',
+    description: 'ボードゲームやテレビゲームで楽しもう',
+    difficulty: 1,
+  ),
+  const Mission(
+    id: 'home_4',
+    placeCategory: 'お家デート',
+    title: '一緒に読書タイム',
+    description: '静かに本を読みながら、同じ空間で過ごそう',
+    difficulty: 1,
+  ),
+  const Mission(
+    id: 'home_5',
+    placeCategory: 'お家デート',
+    title: '一緒に掃除や片付けをする',
+    description: '協力して部屋をきれいにしよう',
+    difficulty: 2,
+  ),
 ];
 

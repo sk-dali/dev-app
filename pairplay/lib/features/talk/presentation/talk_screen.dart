@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../shared/models/talk_question.dart';
 import 'talk_controller.dart';
 
 class TalkScreen extends ConsumerStatefulWidget {
@@ -14,7 +15,7 @@ class TalkScreen extends ConsumerStatefulWidget {
 
 class _TalkScreenState extends ConsumerState<TalkScreen>
     with SingleTickerProviderStateMixin {
-  final List<String> categories = ['すべて', '恋愛', '未来', 'もしも', '性格'];
+  final List<String> categories = ['すべて', '恋愛', '未来', 'もしも', '性格', '学生時代', '今の⚪︎⚪︎'];
 
   // スワイプアニメーション用
   double _dragPosition = 0.0;
@@ -23,6 +24,11 @@ class _TalkScreenState extends ConsumerState<TalkScreen>
   late Animation<double> _animation;
   bool _isAnimating = false;
   String? _previousQuestionId;
+  
+  // パフォーマンス最適化用
+  double? _cachedScreenWidth;
+  TalkQuestion? _cachedNextQuestion;
+  String? _cachedCurrentQuestionId;
 
   @override
   void initState() {
@@ -52,6 +58,7 @@ class _TalkScreenState extends ConsumerState<TalkScreen>
   void _onPanUpdate(DragUpdateDetails details) {
     if (_isAnimating) return;
 
+    // RepaintBoundaryで囲んでいるため、setStateを呼んでも他の部分は再描画されない
     setState(() {
       _dragPosition += details.delta.dx;
       // 回転角度を計算（最大30度）
@@ -64,7 +71,9 @@ class _TalkScreenState extends ConsumerState<TalkScreen>
   void _onPanEnd(DragEndDetails details, TalkController controller) {
     if (_isAnimating) return;
 
-    final screenWidth = MediaQuery.of(context).size.width;
+    // MediaQueryの値をキャッシュ
+    final screenWidth = _cachedScreenWidth ?? MediaQuery.of(context).size.width;
+    _cachedScreenWidth = screenWidth;
     final threshold = screenWidth * 0.3; // 画面幅の30%を閾値とする
 
     if (_dragPosition < -threshold) {
@@ -117,14 +126,32 @@ class _TalkScreenState extends ConsumerState<TalkScreen>
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(talkControllerProvider);
+    // パフォーマンス最適化: 必要な部分だけ監視
+    final currentQuestion = ref.watch(
+      talkControllerProvider.select((state) => state.current),
+    );
+    final selectedCategory = ref.watch(
+      talkControllerProvider.select((state) => state.selectedCategory),
+    );
+    final availableQuestions = ref.watch(
+      talkControllerProvider.select((state) => state.availableQuestions),
+    );
+    final favoriteIds = ref.watch(
+      talkControllerProvider.select((state) => state.favoriteIds),
+    );
     final controller = ref.read(talkControllerProvider.notifier);
+    
+    // MediaQueryの値をキャッシュ
+    _cachedScreenWidth ??= MediaQuery.of(context).size.width;
 
     // 質問が変わったときにドラッグ位置をリセット
-    final currentQuestionId = state.current?.id;
+    final currentQuestionId = currentQuestion?.id;
     if (currentQuestionId != null && currentQuestionId != _previousQuestionId) {
       final previousId = _previousQuestionId;
       _previousQuestionId = currentQuestionId;
+      // キャッシュをクリア
+      _cachedNextQuestion = null;
+      _cachedCurrentQuestionId = null;
       // アニメーション中でない場合、または前の質問から新しい質問に変わった場合のみリセット
       if (!_isAnimating || previousId != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -181,45 +208,50 @@ class _TalkScreenState extends ConsumerState<TalkScreen>
         child: Column(
           children: [
             // カテゴリ選択
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: categories.map((category) {
-                    final isSelected = (category == 'すべて' &&
-                            state.selectedCategory == null) ||
-                        (category != 'すべて' &&
-                            state.selectedCategory == category);
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: FilterChip(
-                        label: Text(category),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          if (category == 'すべて') {
-                            controller.changeCategory(null);
-                          } else {
-                            controller.changeCategory(category);
-                          }
-                        },
-                        backgroundColor: Colors.white.withOpacity(0.2),
-                        selectedColor: Colors.white.withOpacity(0.3),
-                        checkmarkColor: const Color(0xFF1A1A1A),
-                        labelStyle: TextStyle(
-                          color: const Color(0xFF1A1A1A),
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            RepaintBoundary(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: categories.map((category) {
+                      final isSelected = (category == 'すべて' &&
+                              selectedCategory == null) ||
+                          (category != 'すべて' &&
+                              selectedCategory == category);
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: FilterChip(
+                          label: Text(category),
+                          selected: isSelected,
+                          onSelected: (selected) {
+                            if (category == 'すべて') {
+                              controller.changeCategory(null);
+                            } else {
+                              controller.changeCategory(category);
+                            }
+                          },
+                          backgroundColor: Colors.white.withOpacity(0.2),
+                          selectedColor: Colors.white.withOpacity(0.3),
+                          checkmarkColor: const Color(0xFF1A1A1A),
+                          labelStyle: TextStyle(
+                            color: const Color(0xFF1A1A1A),
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
+                          side: BorderSide(
+                            color: Colors.white.withOpacity(0.2),
+                            width: 1,
+                          ),
                         ),
-                        side: BorderSide(
-                          color: Colors.white.withOpacity(0.2),
-                          width: 1,
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+                  ),
                 ),
               ),
             ),
+
+            // カテゴリと質問カードの間の余白
+            const SizedBox(height: 24),
 
             // 質問カード
             Expanded(
@@ -232,21 +264,28 @@ class _TalkScreenState extends ConsumerState<TalkScreen>
 
                   return Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: state.current != null
+                    child: currentQuestion != null
                         ? Builder(
                             builder: (context) {
-                              // 次の質問を取得
-                              final questions = state.availableQuestions;
-                              final currentIndex = questions.indexWhere(
-                                (q) => q.id == state.current!.id,
-                              );
-                              final nextIndex = currentIndex != -1 &&
-                                      currentIndex < questions.length - 1
-                                  ? currentIndex + 1
-                                  : 0;
-                              final nextQuestion = questions.isNotEmpty
-                                  ? questions[nextIndex]
-                                  : null;
+                              // 次の質問を取得（メモ化）
+                              TalkQuestion? nextQuestion;
+                              if (_cachedCurrentQuestionId == currentQuestion.id &&
+                                  _cachedNextQuestion != null) {
+                                nextQuestion = _cachedNextQuestion;
+                              } else {
+                                final currentIndex = availableQuestions.indexWhere(
+                                  (q) => q.id == currentQuestion.id,
+                                );
+                                final nextIndex = currentIndex != -1 &&
+                                        currentIndex < availableQuestions.length - 1
+                                    ? currentIndex + 1
+                                    : 0;
+                                nextQuestion = availableQuestions.isNotEmpty
+                                    ? availableQuestions[nextIndex]
+                                    : null;
+                                _cachedNextQuestion = nextQuestion;
+                                _cachedCurrentQuestionId = currentQuestion.id;
+                              }
 
                               return OverflowBox(
                                 maxWidth: double.infinity,
@@ -287,98 +326,98 @@ class _TalkScreenState extends ConsumerState<TalkScreen>
                                           ),
                                         ),
                                       ),
-                                    // 背景のヒント表示
+                                    // 背景のヒント表示（軽量化: AnimatedContainer → Opacity）
                                     if (_dragPosition < -10)
                                       Positioned.fill(
-                                        child: AnimatedContainer(
-                                          duration: const Duration(milliseconds: 100),
-                                          decoration: BoxDecoration(
-                                            color: Colors.green.withOpacity(
-                                              (-_dragPosition /
-                                                      MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                          0.3)
-                                                  .clamp(0.0, 0.8),
+                                        child: Opacity(
+                                          opacity: (-_dragPosition /
+                                                  (_cachedScreenWidth ?? MediaQuery.of(context).size.width) *
+                                                  0.3)
+                                              .clamp(0.0, 0.8),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.green,
+                                              borderRadius: BorderRadius.circular(20),
                                             ),
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                          child: const Align(
-                                            alignment: Alignment.centerRight,
-                                            child: Padding(
-                                              padding: EdgeInsets.only(right: 24),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-                                                  Text(
-                                                    '次へ',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 24,
-                                                      fontWeight: FontWeight.bold,
+                                            child: const Align(
+                                              alignment: Alignment.centerRight,
+                                              child: Padding(
+                                                padding: EdgeInsets.only(right: 24),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    Text(
+                                                      '次へ',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 24,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
                                                     ),
-                                                  ),
-                                                  SizedBox(width: 16),
-                                                  Icon(
-                                                    Icons.arrow_forward,
-                                                    color: Colors.white,
-                                                    size: 32,
-                                                  ),
-                                                ],
+                                                    SizedBox(width: 16),
+                                                    Icon(
+                                                      Icons.arrow_forward,
+                                                      color: Colors.white,
+                                                      size: 32,
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
                                     // 現在の質問カード
-                                    AnimatedBuilder(
-                                      animation: _animation,
-                                      builder: (context, child) {
-                                        final position = _isAnimating
-                                            ? _animation.value
-                                            : _dragPosition;
-                                        final currentRotation = _isAnimating
-                                            ? position * 0.001
-                                            : _rotation;
+                                    RepaintBoundary(
+                                      child: AnimatedBuilder(
+                                        animation: _animation,
+                                        builder: (context, child) {
+                                          final position = _isAnimating
+                                              ? _animation.value
+                                              : _dragPosition;
+                                          final currentRotation = _isAnimating
+                                              ? position * 0.001
+                                              : _rotation;
 
-                                        return Center(
-                                          child: Transform.translate(
-                                            offset: Offset(position, 0),
-                                            child: Transform.rotate(
-                                              angle: currentRotation,
-                                              child: Transform.scale(
-                                                scale: 0.98,
-                                                child: GestureDetector(
-                                                  onPanUpdate: _onPanUpdate,
-                                                  onPanEnd: (details) =>
-                                                      _onPanEnd(
-                                                          details, controller),
-                                                  child: SizedBox(
-                                                    width: cardWidth,
-                                                    height: cardHeight,
-                                                    child: AppCard(
-                                                      key: ValueKey(
-                                                          state.current!.id),
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              32),
-                                                      child: Center(
-                                                        child: Text(
-                                                          state.current!.text,
-                                                          style: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .headlineMedium
-                                                              ?.copyWith(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                          textAlign:
-                                                              TextAlign.center,
+                                          return Center(
+                                            child: Transform.translate(
+                                              offset: Offset(position, 0),
+                                              child: Transform.rotate(
+                                                angle: currentRotation,
+                                                child: Transform.scale(
+                                                  scale: 0.98,
+                                                  child: GestureDetector(
+                                                    onPanUpdate: _onPanUpdate,
+                                                    onPanEnd: (details) =>
+                                                        _onPanEnd(
+                                                            details, controller),
+                                                    child: SizedBox(
+                                                      width: cardWidth,
+                                                      height: cardHeight,
+                                                      child: AppCard(
+                                                        key: ValueKey(
+                                                            currentQuestion.id),
+                                                        padding:
+                                                            const EdgeInsets.all(
+                                                                32),
+                                                        child: Center(
+                                                          child: Text(
+                                                            currentQuestion.text,
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .headlineMedium
+                                                                ?.copyWith(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                            textAlign:
+                                                                TextAlign.center,
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
@@ -386,9 +425,9 @@ class _TalkScreenState extends ConsumerState<TalkScreen>
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                        );
-                                      },
+                                          );
+                                        },
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -407,30 +446,52 @@ class _TalkScreenState extends ConsumerState<TalkScreen>
             ),
 
             // ボタン群
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            RepaintBoundary(
+              child: Stack(
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      state.current != null &&
-                              controller.isFavorite(state.current!.id)
-                          ? Icons.star
-                          : Icons.star_border,
+                  // 中央のボタン群
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            currentQuestion != null &&
+                                    favoriteIds.contains(currentQuestion.id)
+                                ? Icons.star
+                                : Icons.star_border,
+                          ),
+                          iconSize: 32,
+                          color: currentQuestion != null &&
+                                  favoriteIds.contains(currentQuestion.id)
+                              ? Colors.amber
+                              : Colors.white,
+                          onPressed: () => controller.toggleFavorite(),
+                        ),
+                        const SizedBox(width: 16),
+                        AppButton(
+                          text: 'もっと話してみる',
+                          onPressed: currentQuestion != null
+                              ? () => controller.next()
+                              : null,
+                        ),
+                      ],
                     ),
-                    iconSize: 32,
-                    color: state.current != null &&
-                            controller.isFavorite(state.current!.id)
-                        ? Colors.amber
-                        : Colors.white,
-                    onPressed: () => controller.toggleFavorite(),
                   ),
-                  AppButton(
-                    text: 'もっと話してみる',
-                    onPressed: state.current != null
-                        ? () => controller.next()
-                        : null,
+                  // 左下の前の質問に戻るボタン
+                  Positioned(
+                    left: 16,
+                    bottom: 16,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      iconSize: 32,
+                      color: Colors.white,
+                      onPressed: currentQuestion != null
+                          ? () => controller.previous()
+                          : null,
+                      tooltip: '前の質問に戻る',
+                    ),
                   ),
                 ],
               ),
