@@ -75,6 +75,24 @@ class TalkController extends StateNotifier<TalkState> {
     state = state.copyWith(current: questions[nextIndex]);
   }
 
+  void previous() {
+    final questions = state.availableQuestions;
+    if (questions.isEmpty) return;
+
+    final currentIndex = state.current != null
+        ? questions.indexWhere((q) => q.id == state.current!.id)
+        : -1;
+
+    int previousIndex;
+    if (currentIndex == -1 || currentIndex == 0) {
+      previousIndex = questions.length - 1;
+    } else {
+      previousIndex = currentIndex - 1;
+    }
+
+    state = state.copyWith(current: questions[previousIndex]);
+  }
+
   void changeCategory(String? category) {
     final questions = category == null
         ? _repository.getAll()
