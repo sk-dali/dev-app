@@ -18,16 +18,40 @@ class MissionPlayScreen extends ConsumerStatefulWidget {
   ConsumerState<MissionPlayScreen> createState() => _MissionPlayScreenState();
 }
 
-class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen> {
+class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
+    with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
   final List<String> _doneMissionIds = [];
   final List<String> _skippedMissionIds = [];
   List<Mission> _missions = [];
+  
+  // スワイプアニメーション用
+  double _dragPosition = 0.0;
+  double _rotation = 0.0;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+  bool _isAnimating = false;
 
   @override
   void initState() {
     super.initState();
     _loadMissions();
+    _dragPosition = 0.0;
+    _rotation = 0.0;
+    _isAnimating = false;
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0.0, end: 0.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   void _loadMissions() {
@@ -48,9 +72,74 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen> {
     if (_currentIndex < _missions.length - 1) {
       setState(() {
         _currentIndex++;
+        _dragPosition = 0.0;
+        _rotation = 0.0;
+        _isAnimating = false;
       });
     } else {
       _showCompletionDialog();
+    }
+  }
+
+  void _onPanUpdate(DragUpdateDetails details) {
+    if (_isAnimating) return;
+    
+    setState(() {
+      _dragPosition += details.delta.dx;
+      // 回転角度を計算（最大30度）
+      _rotation = _dragPosition * 0.001;
+      if (_rotation > 0.5) _rotation = 0.5;
+      if (_rotation < -0.5) _rotation = -0.5;
+    });
+  }
+
+  void _onPanEnd(DragEndDetails details) {
+    if (_isAnimating) return;
+    
+    final screenWidth = MediaQuery.of(context).size.width;
+    final threshold = screenWidth * 0.3; // 画面幅の30%を閾値とする
+    
+    if (_dragPosition.abs() > threshold) {
+      // 閾値を超えたら、カードを画面外に飛ばす
+      _isAnimating = true;
+      final targetPosition = _dragPosition > 0 
+          ? screenWidth * 1.5 
+          : -screenWidth * 1.5;
+      
+      _animation = Tween<double>(
+        begin: _dragPosition,
+        end: targetPosition,
+      ).animate(CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOut,
+      ));
+      
+      _animationController.forward().then((_) {
+        // アニメーション完了後、ミッションを完了
+        if (_dragPosition > 0) {
+          _completeMission(true); // 右スワイプで達成
+        } else {
+          _completeMission(false); // 左スワイプでスキップ
+        }
+        _animationController.reset();
+      });
+    } else {
+      // 閾値未満なら、元の位置に戻す
+      _animation = Tween<double>(
+        begin: _dragPosition,
+        end: 0.0,
+      ).animate(CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOut,
+      ));
+      
+      _animationController.forward().then((_) {
+        setState(() {
+          _dragPosition = 0.0;
+          _rotation = 0.0;
+        });
+        _animationController.reset();
+      });
     }
   }
 
@@ -161,38 +250,127 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: AppCard(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        mission.title,
-                        style: Theme.of(context).textTheme.headlineMedium,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        mission.description,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          3,
-                          (index) => Icon(
-                            Icons.star,
-                            color: index < mission.difficulty
-                                ? Colors.amber
-                                : Colors.grey[300],
-                            size: 20,
+                child: Stack(
+                  children: [
+                    // 背景のヒント表示
+                    if (_dragPosition.abs() > 10)
+                      Positioned.fill(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 100),
+                          decoration: BoxDecoration(
+                            color: _dragPosition > 0
+                                ? Colors.green.withOpacity(
+                                    (_dragPosition / MediaQuery.of(context).size.width * 0.3).clamp(0.0, 0.8))
+                                : Colors.orange.withOpacity(
+                                    (-_dragPosition / MediaQuery.of(context).size.width * 0.3).clamp(0.0, 0.8)),
+                            borderRadius: BorderRadius.circular(16),
                           ),
+                          child: _dragPosition > 0
+                              ? const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 24),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.check_circle,
+                                            color: Colors.white, size: 32),
+                                        SizedBox(width: 16),
+                                        Text(
+                                          '達成',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : const Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(right: 24),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          'スキップ',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(width: 16),
+                                        Icon(Icons.skip_next,
+                                            color: Colors.white, size: 32),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                         ),
                       ),
-                    ],
-                  ),
+                    // カード
+                    AnimatedBuilder(
+                      animation: _animation,
+                      builder: (context, child) {
+                        final position = _isAnimating ? _animation.value : _dragPosition;
+                        final currentRotation = _isAnimating
+                            ? position * 0.001
+                            : _rotation;
+                        
+                        return Transform.translate(
+                          offset: Offset(position, 0),
+                          child: Transform.rotate(
+                            angle: currentRotation,
+                            child: GestureDetector(
+                              onPanUpdate: _onPanUpdate,
+                              onPanEnd: _onPanEnd,
+                              child: AppCard(
+                                padding: const EdgeInsets.all(24),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      mission.title,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineMedium,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 24),
+                                    Text(
+                                      mission.description,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: List.generate(
+                                        3,
+                                        (index) => Icon(
+                                          Icons.star,
+                                          color: index < mission.difficulty
+                                              ? Colors.amber
+                                              : Colors.grey[300],
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
