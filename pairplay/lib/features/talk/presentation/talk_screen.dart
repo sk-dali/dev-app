@@ -15,7 +15,7 @@ class TalkScreen extends ConsumerStatefulWidget {
 
 class _TalkScreenState extends ConsumerState<TalkScreen>
     with SingleTickerProviderStateMixin {
-  final List<String> categories = ['すべて', '恋愛', '未来', 'もしも', '性格'];
+  final List<String> categories = ['すべて', '恋愛', '未来', 'もしも', '性格', '学生時代', '今の⚪︎⚪︎'];
 
   // スワイプアニメーション用
   double _dragPosition = 0.0;

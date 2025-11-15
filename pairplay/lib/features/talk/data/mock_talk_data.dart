@@ -108,5 +108,59 @@ final List<TalkQuestion> mockTalkQuestions = [
     category: '性格',
     text: '相手に似ていると思う有名人は？',
   ),
+
+  // 学生時代カテゴリ
+  const TalkQuestion(
+    id: 'school_1',
+    category: '学生時代',
+    text: '中学での部活は？',
+  ),
+  const TalkQuestion(
+    id: 'school_2',
+    category: '学生時代',
+    text: '一番好きだった給食のメニューは？',
+  ),
+  const TalkQuestion(
+    id: 'school_3',
+    category: '学生時代',
+    text: '学生時代の一番の思い出は？',
+  ),
+  const TalkQuestion(
+    id: 'school_4',
+    category: '学生時代',
+    text: '学生時代に一番頑張ったことは？',
+  ),
+  const TalkQuestion(
+    id: 'school_5',
+    category: '学生時代',
+    text: '学生時代に戻れるなら、何をしたい？',
+  ),
+
+  // 今の⚪︎⚪︎カテゴリ
+  const TalkQuestion(
+    id: 'current_1',
+    category: '今の⚪︎⚪︎',
+    text: '今一番行きたいデート先は？',
+  ),
+  const TalkQuestion(
+    id: 'current_2',
+    category: '今の⚪︎⚪︎',
+    text: '今ハマっている歌は？',
+  ),
+  const TalkQuestion(
+    id: 'current_3',
+    category: '今の⚪︎⚪︎',
+    text: '今一番食べたいものは？',
+  ),
+  const TalkQuestion(
+    id: 'current_4',
+    category: '今の⚪︎⚪︎',
+    text: '今一番見たい映画・ドラマは？',
+  ),
+  const TalkQuestion(
+    id: 'current_5',
+    category: '今の⚪︎⚪︎',
+    text: '今一番欲しいものは？',
+  ),
 ];
 
