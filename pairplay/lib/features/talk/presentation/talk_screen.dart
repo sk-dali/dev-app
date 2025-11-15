@@ -39,13 +39,13 @@ class _TalkScreenState extends ConsumerState<TalkScreen> {
         title: const Text(
           'ふたりトーク',
           style: TextStyle(
-            color: Colors.white,
+            color: Color(0xFF1A1A1A),
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white.withOpacity(0.2),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Color(0xFF1A1A1A)),
         actions: [
           IconButton(
             icon: const Icon(Icons.flag_outlined),
@@ -60,10 +60,10 @@ class _TalkScreenState extends ConsumerState<TalkScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFFF8A65), // オレンジ
-              Color(0xFFFFB74D), // 黄色がかったオレンジ
-              Color(0xFFFFA726), // アンバー
-              Color(0xFFFF7043), // 深いオレンジ
+              Color(0xFFE1BEE7), // 薄い紫
+              Color(0xFFCE93D8), // ライトパープル
+              Color(0xFFBA68C8), // ミディアムパープル
+              Color(0xFF9C27B0), // 濃い紫
             ],
           ),
         ),
@@ -95,9 +95,9 @@ class _TalkScreenState extends ConsumerState<TalkScreen> {
                         },
                         backgroundColor: Colors.white.withOpacity(0.2),
                         selectedColor: Colors.white.withOpacity(0.3),
-                        checkmarkColor: Colors.white,
+                        checkmarkColor: const Color(0xFF1A1A1A),
                         labelStyle: TextStyle(
-                          color: Colors.white,
+                          color: const Color(0xFF1A1A1A),
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
                         side: BorderSide(
