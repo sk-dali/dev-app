@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -196,10 +197,36 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
     if (_missions.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('ミッションプレイ'),
+          title: const Text(
+            'ミッションプレイ',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
-        body: const Center(
-          child: Text('このカテゴリにはミッションがありません'),
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFFF8A65), // オレンジ
+                Color(0xFFFFB74D), // 黄色がかったオレンジ
+                Color(0xFFFFA726), // アンバー
+                Color(0xFFFF7043), // 深いオレンジ
+              ],
+            ),
+          ),
+          child: const Center(
+            child: Text(
+              'このカテゴリにはミッションがありません',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
         ),
       );
     }
@@ -207,10 +234,36 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
     if (_currentIndex >= _missions.length) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('ミッションプレイ'),
+          title: const Text(
+            'ミッションプレイ',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
-        body: const Center(
-          child: Text('すべてのミッションを完了しました'),
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFFF8A65), // オレンジ
+                Color(0xFFFFB74D), // 黄色がかったオレンジ
+                Color(0xFFFFA726), // アンバー
+                Color(0xFFFF7043), // 深いオレンジ
+              ],
+            ),
+          ),
+          child: const Center(
+            child: Text(
+              'すべてのミッションを完了しました',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
         ),
       );
     }
@@ -226,9 +279,31 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
           onPressed: () => context.go('/'),
         ),
         automaticallyImplyLeading: false,
-        title: Text('${widget.category}のミッション'),
+        title: Text(
+          '${widget.category}のミッション',
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: SafeArea(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFFF8A65), // オレンジ
+              Color(0xFFFFB74D), // 黄色がかったオレンジ
+              Color(0xFFFFA726), // アンバー
+              Color(0xFFFF7043), // 深いオレンジ
+            ],
+          ),
+        ),
+        child: SafeArea(
         child: Column(
           children: [
             // プログレスバー
@@ -236,11 +311,18 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  LinearProgressIndicator(value: progress),
+                  LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor: Colors.white.withOpacity(0.3),
+                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     '${_currentIndex + 1} / ${_missions.length}',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                 ],
               ),
@@ -336,7 +418,11 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
                                       mission.title,
                                       style: Theme.of(context)
                                           .textTheme
-                                          .headlineMedium,
+                                          .headlineMedium
+                                          ?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                       textAlign: TextAlign.center,
                                     ),
                                     const SizedBox(height: 24),
@@ -344,7 +430,10 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
                                       mission.description,
                                       style: Theme.of(context)
                                           .textTheme
-                                          .bodyMedium,
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            color: Colors.white.withOpacity(0.9),
+                                          ),
                                       textAlign: TextAlign.center,
                                     ),
                                     const SizedBox(height: 16),
@@ -357,7 +446,7 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
                                           Icons.star,
                                           color: index < mission.difficulty
                                               ? Colors.amber
-                                              : Colors.grey[300],
+                                              : Colors.white.withOpacity(0.3),
                                           size: 20,
                                         ),
                                       ),
@@ -382,28 +471,94 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => _completeMission(false),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
+                              width: 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () => _completeMission(false),
+                              borderRadius: BorderRadius.circular(20),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                child: Center(
+                                  child: Text(
+                                    'スキップ',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                      child: const Text('スキップ'),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => _completeMission(true),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
+                              width: 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () => _completeMission(true),
+                              borderRadius: BorderRadius.circular(20),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                child: Center(
+                                  child: Text(
+                                    '達成',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                      child: const Text('達成'),
                     ),
                   ),
                 ],
@@ -411,6 +566,7 @@ class _MissionPlayScreenState extends ConsumerState<MissionPlayScreen>
             ),
           ],
         ),
+      ),
       ),
     );
   }

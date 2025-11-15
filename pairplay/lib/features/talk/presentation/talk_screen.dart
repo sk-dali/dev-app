@@ -36,7 +36,16 @@ class _TalkScreenState extends ConsumerState<TalkScreen> {
           onPressed: () => context.go('/'),
         ),
         automaticallyImplyLeading: false,
-        title: const Text('ふたりトーク'),
+        title: const Text(
+          'ふたりトーク',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             icon: const Icon(Icons.flag_outlined),
@@ -45,7 +54,20 @@ class _TalkScreenState extends ConsumerState<TalkScreen> {
           ),
         ],
       ),
-      body: SafeArea(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFFF8A65), // オレンジ
+              Color(0xFFFFB74D), // 黄色がかったオレンジ
+              Color(0xFFFFA726), // アンバー
+              Color(0xFFFF7043), // 深いオレンジ
+            ],
+          ),
+        ),
+        child: SafeArea(
         child: Column(
           children: [
             // カテゴリ選択
@@ -71,6 +93,17 @@ class _TalkScreenState extends ConsumerState<TalkScreen> {
                             controller.changeCategory(category);
                           }
                         },
+                        backgroundColor: Colors.white.withOpacity(0.2),
+                        selectedColor: Colors.white.withOpacity(0.3),
+                        checkmarkColor: Colors.white,
+                        labelStyle: TextStyle(
+                          color: Colors.white,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        ),
+                        side: BorderSide(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
                       ),
                     );
                   }).toList(),
@@ -91,15 +124,23 @@ class _TalkScreenState extends ConsumerState<TalkScreen> {
                           child: Center(
                             child: Text(
                               state.current!.text,
-                              style:
-                                  Theme.of(context).textTheme.headlineMedium,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineMedium
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                               textAlign: TextAlign.center,
                             ),
                           ),
                         ),
                       )
                     : const Center(
-                        child: Text('質問がありません'),
+                        child: Text(
+                          '質問がありません',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
               ),
             ),
@@ -121,7 +162,7 @@ class _TalkScreenState extends ConsumerState<TalkScreen> {
                     color: state.current != null &&
                             controller.isFavorite(state.current!.id)
                         ? Colors.amber
-                        : null,
+                        : Colors.white,
                     onPressed: () => controller.toggleFavorite(),
                   ),
                   AppButton(
@@ -135,6 +176,7 @@ class _TalkScreenState extends ConsumerState<TalkScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

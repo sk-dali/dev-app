@@ -29,9 +29,31 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           onPressed: () => context.go('/'),
         ),
         automaticallyImplyLeading: false,
-        title: const Text('思い出'),
+        title: const Text(
+          '思い出',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: SafeArea(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFFF8A65), // オレンジ
+              Color(0xFFFFB74D), // 黄色がかったオレンジ
+              Color(0xFFFFA726), // アンバー
+              Color(0xFFFF7043), // 深いオレンジ
+            ],
+          ),
+        ),
+        child: SafeArea(
         child: FutureBuilder<Map<String, List<String>>>(
           future: historyService.loadAllMissionSessions(),
           builder: (context, missionSnapshot) {
@@ -46,12 +68,19 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                       // ミッション履歴
                       Text(
                         '最近のふたりミッション',
-                        style: Theme.of(context).textTheme.headlineMedium,
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       const SizedBox(height: 16),
                       if (missionSnapshot.connectionState ==
                           ConnectionState.waiting)
-                        const Center(child: CircularProgressIndicator())
+                        const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                        )
                       else if (missionSnapshot.hasData &&
                           missionSnapshot.data!.isNotEmpty)
                         ...missionSnapshot.data!.entries.map((entry) {
@@ -66,13 +95,21 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                                     entry.key,
                                     style: Theme.of(context)
                                         .textTheme
-                                        .titleMedium,
+                                        .titleMedium
+                                        ?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
                                     '達成したミッション: ${entry.value.length}件',
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: Colors.white.withOpacity(0.9),
+                                        ),
                                   ),
                                 ],
                               ),
@@ -82,18 +119,28 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                       else
                         const Padding(
                           padding: EdgeInsets.all(16.0),
-                          child: Text('まだミッション履歴がありません'),
+                          child: Text(
+                            'まだミッション履歴がありません',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       const SizedBox(height: 32),
                       // トーク履歴
                       Text(
                         'お気に入りの質問',
-                        style: Theme.of(context).textTheme.headlineMedium,
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       const SizedBox(height: 16),
                       if (talkSnapshot.connectionState ==
                           ConnectionState.waiting)
-                        const Center(child: CircularProgressIndicator())
+                        const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                        )
                       else if (talkSnapshot.hasData &&
                           talkSnapshot.data!.isNotEmpty)
                         ...talkSnapshot.data!.take(5).map((favoriteId) {
@@ -119,16 +166,19 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                                         .textTheme
                                         .bodySmall
                                         ?.copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
+                                          color: Colors.white.withOpacity(0.8),
                                         ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     question.text,
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -138,7 +188,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                       else
                         const Padding(
                           padding: EdgeInsets.all(16.0),
-                          child: Text('まだお気に入りの質問がありません'),
+                          child: Text(
+                            'まだお気に入りの質問がありません',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                     ],
                   ),
@@ -147,6 +200,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             );
           },
         ),
+      ),
       ),
     );
   }

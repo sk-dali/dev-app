@@ -22,9 +22,31 @@ class MissionCategoryScreen extends StatelessWidget {
           onPressed: () => context.go('/'),
         ),
         automaticallyImplyLeading: false,
-        title: const Text('ふたりミッション'),
+        title: const Text(
+          'ふたりミッション',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: SafeArea(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFFF8A65), // オレンジ
+              Color(0xFFFFB74D), // 黄色がかったオレンジ
+              Color(0xFFFFA726), // アンバー
+              Color(0xFFFF7043), // 深いオレンジ
+            ],
+          ),
+        ),
+        child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -33,12 +55,17 @@ class MissionCategoryScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 'デート先を選ぶ',
-                style: Theme.of(context).textTheme.headlineMedium,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               const SizedBox(height: 8),
               Text(
                 'どこでミッションに挑戦しますか？',
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.white.withOpacity(0.9),
+                    ),
               ),
               const SizedBox(height: 24),
               Expanded(
@@ -68,19 +95,31 @@ class MissionCategoryScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     category['name']!,
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     category['description']!,
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: Colors.white.withOpacity(0.9),
+                                        ),
                                   ),
                                 ],
                               ),
                             ),
-                            const Icon(Icons.chevron_right),
+                            const Icon(
+                              Icons.chevron_right,
+                              color: Colors.white,
+                            ),
                           ],
                         ),
                       ),
@@ -91,6 +130,7 @@ class MissionCategoryScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

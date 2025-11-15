@@ -9,14 +9,36 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PairPlay'),
+        title: const Text(
+          'PairPlay',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFFF8A65), // オレンジ
+              Color(0xFFFFB74D), // 黄色がかったオレンジ
+              Color(0xFFFFA726), // アンバー
+              Color(0xFFFF7043), // 深いオレンジ
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               const SizedBox(height: 16),
               _buildMenuCard(
                 context,
@@ -54,7 +76,8 @@ class HomeScreen extends StatelessWidget {
                 description: 'これまでのトークとミッションを振り返ろう',
                 onTap: () => context.go('/history'),
               ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -78,8 +101,8 @@ class HomeScreen extends StatelessWidget {
             icon,
             size: 48,
             color: isDisabled
-                ? Colors.grey
-                : Theme.of(context).colorScheme.primary,
+                ? Colors.white.withOpacity(0.5)
+                : Colors.white,
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -89,14 +112,19 @@ class HomeScreen extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: isDisabled ? Colors.grey : null,
+                        color: isDisabled
+                            ? Colors.white.withOpacity(0.5)
+                            : Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   description,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: isDisabled ? Colors.grey : null,
+                        color: isDisabled
+                            ? Colors.white.withOpacity(0.7)
+                            : Colors.white.withOpacity(0.9),
                       ),
                 ),
               ],
@@ -104,7 +132,9 @@ class HomeScreen extends StatelessWidget {
           ),
           Icon(
             Icons.chevron_right,
-            color: isDisabled ? Colors.grey : null,
+            color: isDisabled
+                ? Colors.white.withOpacity(0.5)
+                : Colors.white,
           ),
         ],
       ),
